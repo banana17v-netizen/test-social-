@@ -1,0 +1,1 @@
+{"case_id":"eth_drop","input":{"token_symbol":"ETH","as_of":"2026-01-01T00:00:00Z"},"raw_data_snapshot":"harness/eval/snapshots/eth_drop.json","expected":{"narrative_stage":"weakening","must_include_evidence_types":["exchange_flow","funding_rate"],"direction":"down"}}

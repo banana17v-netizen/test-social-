@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.local)",
+      "Read(./.env.local.*)",
+      "Read(./.env.production)",
+      "Read(./.env.development)",
+      "Read(./.env.staging)",
+      "Read(**/.env)",
+      "Bash(cat .env)",
+      "Bash(cat .env.local*)",
+      "Bash(cat .env.prod*)",
+      "Bash(cat .env.dev*)",
+      "Bash(cat .env.stag*)",
+      "Bash(type .env)",
+      "Bash(type .env.local*)",
+      "Bash(type .env.prod*)",
+      "Bash(Get-Content .env)",
+      "Bash(Get-Content .env.local*)",
+      "Bash(Get-Content .env.prod*)",
+      "Bash(rm -rf*)",
+      "Bash(del /f*)",
+      "Bash(git push --force*)",
+      "Bash(git reset --hard*)"
+    ]
+  }
+}
+  

@@ -1,0 +1,1 @@
+{"case_id":"btc_move","input":{"token_symbol":"BTC","as_of":"2026-01-01T00:00:00Z"},"raw_data_snapshot":"harness/eval/snapshots/btc_move.json","expected":{"narrative_stage":"strengthening","must_include_evidence_types":["social","exchange_flow"],"direction":"up"}}
