@@ -6,11 +6,17 @@ NUM_RE = re.compile(r"-?\d+(?:[.,]\d+)?\s*(?:%|k|tr|m|b|triệu|nghìn|ngàn)?",
 _UNIT_MULT = {"triệu": 1e6, "nghìn": 1e3, "ngàn": 1e3, "tr": 1e6, "k": 1e3, "m": 1e6, "b": 1e9}
 
 def _parse_number(raw):
-    s = raw.strip().lower().replace(",", ".")
+    s = raw.strip().lower()
     mult = 1.0
     for suffix, m in sorted(_UNIT_MULT.items(), key=lambda kv: -len(kv[0])):
         if s.endswith(suffix): mult, s = m, s[:-len(suffix)].strip(); break
     s = s.rstrip("%").strip()
+    if "," in s:
+        whole, _, frac = s.partition(",")
+        # LLM explanations are often in English prose ("41,000 views"), where a comma followed
+        # by exactly 3 digits is a thousands separator, not a decimal point -- treating it as
+        # decimal (old behavior) turned real, grounded numbers into false "hallucination" flags.
+        s = whole + frac if len(frac) == 3 else whole + "." + frac
     try: return float(s) * mult
     except ValueError: return None
 
