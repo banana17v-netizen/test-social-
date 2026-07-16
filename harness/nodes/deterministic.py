@@ -6,15 +6,17 @@ def _raw(source, result):
     return {"source": source, "data": result.data, "source_health": result.source_health}
 
 def ingest_social_node(state):
-    if state.get("raw_data"): return {"raw_data": []}
+    # NOTE: no "already have raw_data" guard here -- the 3 ingest_* nodes fan out from START in
+    # parallel and each must always append its own entry. A state.get("raw_data") truthiness
+    # guard here previously caused whichever node ran last to see a sibling's write and skip
+    # itself entirely, silently dropping that source (e.g. market showing "down" when Binance
+    # was actually fine).
     return {"raw_data": [_raw("social", fetch_social_mentions(state["token_symbol"]))]}
 
 def ingest_onchain_node(state):
-    if state.get("raw_data"): return {"raw_data": []}
     return {"raw_data": [_raw("onchain", fetch_exchange_flow(state["token_symbol"]))]}
 
 def ingest_market_node(state):
-    if state.get("raw_data"): return {"raw_data": []}
     return {"raw_data": [_raw("market", fetch_market_data(state["token_symbol"]))]}
 
 def get_from(raw_data, source):

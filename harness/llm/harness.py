@@ -3,8 +3,8 @@ from pydantic import BaseModel, ValidationError
 from harness.contracts.evidence import EvidenceBundle, EvidenceItem
 from harness.obs.tracing import COST_METER, check_pipeline_budget, current_trace_id, trace_span
 
-MODEL_STRONG = "gemini-3-flash-preview"
-MODEL_CHEAP = "gemini-3.1-flash-lite"
+MODEL_STRONG = "gemini-3.1-flash-lite"
+MODEL_CHEAP = "gemini-flash-lite-latest"
 
 class HarnessError(Exception): pass
 
@@ -51,10 +51,18 @@ def llm_structured(prompt: str, schema: type[BaseModel], model: str, max_retries
     last_err = None
     for attempt in range(max_retries + 1):
         spent_before = COST_METER.total_for_trace(current_trace_id())
-        with trace_span("llm_call", model=model, attempt=attempt) as span:
-            raw = call_provider(model, prompt, temperature=temps[attempt], json_mode=True)
-            span["meta"].update(token_in=count_tokens(prompt), token_out=count_tokens(raw),
-                                cost_usd=COST_METER.total_for_trace(current_trace_id()) - spent_before)
+        try:
+            with trace_span("llm_call", model=model, attempt=attempt) as span:
+                raw = call_provider(model, prompt, temperature=temps[attempt], json_mode=True)
+                span["meta"].update(token_in=count_tokens(prompt), token_out=count_tokens(raw),
+                                    cost_usd=COST_METER.total_for_trace(current_trace_id()) - spent_before)
+        except HarnessError:
+            raise  # not retryable (e.g. missing API key) -- don't waste attempts
+        except Exception as e:
+            # provider-level failure (rate limit, 5xx, timeout) -- retry like a schema miss
+            # instead of crashing the node; caller only ever sees HarnessError once retries exhaust.
+            last_err = e
+            continue
         try:
             result = schema.model_validate_json(_strip_fences(raw))
             check_pipeline_budget(current_trace_id())

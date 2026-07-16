@@ -16,8 +16,8 @@ LOGGER = SpanLogger()
 class CostMeter:
     # Free-tier Gemini models are $0/token; update these if the project moves to a paid billing tier.
     RATES = {
-        "gemini-3-flash-preview": (0.0, 0.0),
         "gemini-3.1-flash-lite": (0.0, 0.0),
+        "gemini-flash-lite-latest": (0.0, 0.0),
     }
     def __init__(self): self.entries: list[dict] = []
     def add(self, model, input_tokens, output_tokens, trace_id=None):

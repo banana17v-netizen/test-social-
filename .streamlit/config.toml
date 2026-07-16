@@ -1,0 +1,9 @@
+# Streamlit theme for the Social Listening Harness dashboard.
+# Kept minimal on purpose: we set the brand accent + font here so Streamlit's own
+# widgets (buttons, sidebar, focus rings) match the custom components, and we leave
+# base/background unset so Streamlit's built-in Light/Dark/"Use system" toggle keeps
+# working. The custom HTML/CSS in dashboard.py uses neutral translucent surfaces +
+# inherited text so it adapts to whichever theme is active.
+[theme]
+primaryColor = "#2a78d6"
+font = "sans serif"
